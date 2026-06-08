@@ -35,18 +35,18 @@ echo "Starting Pipeline for Part 1 (Base Connector)..."
 export CAD_PATH_1="$DATASET_DIR/models/obj_000001.ply" 
 export OUTPUT_DIR_1="$SCENE_DIR/outputs_part1"
 
-# # 1. Render Templates
-# cd $BASE_DIR/Render
-# # blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 
+# 1. Render Templates
+cd $BASE_DIR/Render
+# blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 
 
-# # 2. Instance Segmentation (ISM)
-# cd $BASE_DIR/Instance_Segmentation_Model
-# python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
+# 2. Instance Segmentation (ISM)
+cd $BASE_DIR/Instance_Segmentation_Model
+python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
 
-# # ---> INJECT POST-PROCESSING HERE <---
-# export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
-# cd $BASE_DIR
-# python postprocess_ism.py --json_path $SEG_PATH_1 --rgb_path $RGB_PATH --target nut
+# INJECT POST-PROCESSING HERE
+export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
+cd $BASE_DIR
+python postprocess_ism.py --json_path $SEG_PATH_1 --rgb_path $RGB_PATH --target nut
 
 # 3. Pose Estimation (PEM)
 export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
@@ -62,11 +62,16 @@ export OUTPUT_DIR_2="$SCENE_DIR/outputs_part2"
 
 # 1. Render Templates
 cd $BASE_DIR/Render
-# blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 
+blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 
 
-# # 2. Instance Segmentation (ISM)
-# cd $BASE_DIR/Instance_Segmentation_Model
-# python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
+# 2. Instance Segmentation (ISM)
+cd $BASE_DIR/Instance_Segmentation_Model
+python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
+
+# INJECT POST-PROCESSING HERE
+export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
+cd $BASE_DIR
+python postprocess_ism.py --json_path $SEG_PATH_1 --rgb_path $RGB_PATH --target pipe
 
 # 3. Pose Estimation (PEM)
 export SEG_PATH_2=$OUTPUT_DIR_2/sam6d_results/detection_ism.json
@@ -81,4 +86,4 @@ cd $BASE_DIR
 # Notice how we now pass the scene and frame directly into the python script!
 python create_viz_pipeconnector.py --scene 000024 --frame 000013 --boxes --masks --axes --output pipe_assembly_scene24_frame130.png
 
-# echo "All Done! Check pipe_assembly_scene24_frame130.png."
+echo "All Done! Check pipe_assembly_scene24_frame130.png."
