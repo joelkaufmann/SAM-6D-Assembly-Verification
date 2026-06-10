@@ -124,6 +124,12 @@ def main():
     t_rel = T_part1_part2[:3, 3]
     R_rel_matrix = T_part1_part2[:3, :3]
     r_euler = R.from_matrix(R_rel_matrix).as_euler('xyz', degrees=True)
+    
+    # --- AUTOMATED PASS/FAIL LOGIC ---
+    THRESHOLD_MM = 23.5
+    z_offset = abs(t_rel[2])
+    is_pass = z_offset <= THRESHOLD_MM
+    status_text = "PASS" if is_pass else "FAIL"
 
     print(f"\n--- Assembly Verification Metrics (Scene {args.scene}) ---")
     print("Target: Insert (Part 2) relative to Base (Part 1)\n")
@@ -132,6 +138,8 @@ def main():
     print(f"   Y (Up/Down)    : {t_rel[1]:.1f} mm")
     print(f"   Z (Front/Back) : {t_rel[2]:.1f} mm")
     print(f"   Total Distance : {np.linalg.norm(t_rel):.1f} mm\n")
+    print(f"2. Automated Tolerance Verification:")
+    print(f"   Status         : {status_text} (Threshold: {THRESHOLD_MM} mm)\n")
 
     # ==========================================
     # SECTION B: Drawing the Visualization
@@ -178,14 +186,10 @@ def main():
     y_axis_1 = R1[:, 1].reshape(3, 1)
     
     # 3. Define the two measurement points along the perfect Z-axis in 3D
-    # Point A is the origin of the base
     pt_A_3d = t1
-    
-    # Point B is exactly t_rel[2] millimeters away strictly along the Z-axis
     pt_B_3d = t1 + (z_axis_1 * t_rel[2])
     
     # 4. Offset both points by 60mm along the local negative Y-axis 
-    # This pushes the dimension line "down" relative to the object in 3D space
     offset_dist_mm = 100.0
     v_offset_3d = -y_axis_1 * offset_dist_mm
     
@@ -212,19 +216,26 @@ def main():
     cv2.circle(img_bgr, pB_dim, 4, (0, 255, 255), -1)
 
     # 8. Add the Z-offset text aligned near the dimension line
-    z_offset = abs(t_rel[2])
     dim_text = f"Z: {z_offset:.1f} mm"
     
-    # Calculate text position slightly above the midpoint of the dimension line
     mid_x = int((pA_dim[0] + pB_dim[0]) / 2)
     mid_y = int((pA_dim[1] + pB_dim[1]) / 2) - 15
     
     text_size = cv2.getTextSize(dim_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)[0]
     text_x = mid_x - (text_size[0] // 2)
     
-    # Draw black outline, then yellow text
     cv2.putText(img_bgr, dim_text, (text_x, mid_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 4)
     cv2.putText(img_bgr, dim_text, (text_x, mid_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
+
+    # 9. Draw the automated PASS/FAIL verification status
+    status_color = (0, 255, 0) if is_pass else (0, 0, 255) # Green for Pass, Red for Fail (BGR format)
+    status_y = mid_y + 40 # Place it neatly under the dimension text
+    status_size = cv2.getTextSize(status_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)[0]
+    status_x = mid_x - (status_size[0] // 2)
+    
+    # Draw black outline, then the status text
+    cv2.putText(img_bgr, status_text, (status_x, status_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 5)
+    cv2.putText(img_bgr, status_text, (status_x, status_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, status_color, 3)
 
     cv2.imwrite(args.output, img_bgr)
     print(f"Success! Visual saved to: {args.output}")
