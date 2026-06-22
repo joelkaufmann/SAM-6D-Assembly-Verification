@@ -6,7 +6,7 @@
 This repository extends the **SAM-6D** framework (CVPR 2024) to handle egocentric 3D assembly verification using data collected by the Azure Kinect DK depth cam of our own assembly process. It introduces specialized post-processing steps to overcome zero-shot segmentation boundaries and overlays perspective-correct 3D dimensioning to measure precise millimeter-level insertion depths.
 
 <p align="center">
-  <img width="50%" src="SAM-6D/pipe_assembly_viz.png" alt="3D Perspective Coaxial Assembly Verification Overlay"/>
+  <img width="50%" src="SAM-6D/architecture_pipeline.png" alt="3D Perspective Coaxial Assembly Verification Overlay"/>
 </p>
 
 ## Overview
