@@ -27,7 +27,7 @@ This extension introduces an intervened, end-to-end pipeline:
 ### 1. Environment Setup
 Clone this repository and restore the configured environment matrix:
 ```bash
-git clone [https://github.com/joelkaufmann/SAM-6D-Assembly-Verification.git](https://github.com/joelkaufmann/SAM-6D-Assembly-Verification.git)
+git clone https://github.com/joelkaufmann/SAM-6D-Assembly-Verification.git
 cd SAM-6D-Assembly-Verification
 conda env create -f SAM-6D/environment.yaml
 conda activate sam6d
@@ -36,32 +36,9 @@ conda activate sam6d
 ### 2. Running the Core Pipeline
 Execute the foundational estimation step on your target scene and frame sequence:
 ```bash
-bash SAM-6D/run_pipeconnector.sh
+sbatch SAM-6D/run_pipeconnector.sh
 ```
 
-### 3. Executing the Morphological Mask Splitter
-If the instance segmenter yields a single merged mask across the assembly interface, pass the generated JSON file to the color post-processor to isolate the individual target items (e.g., `nut` or `pipe` targeting category IDs):
-```bash
-python SAM-6D/postprocessing.py \
-  --json_path Data/BOP/pipeconnector/test/000024/outputs_part1/sam6d_results/detection_ism.json \
-  --rgb_path Data/BOP/pipeconnector/test/000024/rgb/000015.png \
-  --target pipe
-```
-*Note: This script safely archives a pristine copy of your original inference arrays as `_RAW.json`, allowing you to run, tweak parameters, and evaluate multiple times without re-running the heavy neural network inference layer.*
-
-### 4. Generating the 3D Verification Visuals
-Compute the perspective-correct relative transformation matrix ($T_{rel} = T_{base}^{-1} \times T_{insert}$) and overlay the CAD-style 3D dimension tracking lines:
-```bash
-python SAM-6D/create_viz_pipeconnector.py \
-  --scene 000024 \
-  --frame 000015 \
-  --boxes \
-  --masks \
-  --axes \
-  --output pipe_assembly_scene24_frame15.png
-```
-
----
 
 ## Workspace Directory Structure
 The repository is structured to separate raw platform build processes from core engineering modules:
