@@ -36,6 +36,7 @@ export CAD_PATH_1="$DATASET_DIR/models/obj_000001.ply"
 export OUTPUT_DIR_1="$SCENE_DIR/outputs_part1"
 
 # 1. Render Templates
+# Only has to be rendered once per object, rendered templates are already included in the data folder
 cd $BASE_DIR/Render
 # blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 
 
@@ -43,7 +44,7 @@ cd $BASE_DIR/Render
 cd $BASE_DIR/Instance_Segmentation_Model
 python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_1 --cad_path $CAD_PATH_1 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
 
-# INJECT POST-PROCESSING HERE
+# Mask POST-PROCESSING
 export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
 cd $BASE_DIR
 python postprocess_ism.py --json_path $SEG_PATH_1 --rgb_path $RGB_PATH --target nut
@@ -62,13 +63,13 @@ export OUTPUT_DIR_2="$SCENE_DIR/outputs_part2"
 
 # 1. Render Templates
 cd $BASE_DIR/Render
-blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 
+# blenderproc run render_custom_templates.py --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 
 
 # 2. Instance Segmentation (ISM)
 cd $BASE_DIR/Instance_Segmentation_Model
 python run_inference_custom.py --segmentor_model sam --output_dir $OUTPUT_DIR_2 --cad_path $CAD_PATH_2 --rgb_path $RGB_PATH --depth_path $DEPTH_PATH --cam_path $CAMERA_PATH
 
-# INJECT POST-PROCESSING HERE
+# Mask POST-PROCESSING
 export SEG_PATH_1=$OUTPUT_DIR_1/sam6d_results/detection_ism.json
 cd $BASE_DIR
 python postprocess_ism.py --json_path $SEG_PATH_1 --rgb_path $RGB_PATH --target pipe
